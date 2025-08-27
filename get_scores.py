@@ -100,6 +100,13 @@ def get_scores(team_name=None):
                 return
 
             live_data = game_data.get('liveData', {})
+            linescore = live_data.get('linescore', {})
+            inning_info = ""
+            if linescore.get('currentInning'):
+                inning_half = linescore.get('inningHalf', '')
+                inning_ordinal = linescore.get('currentInningOrdinal', '')
+                inning_info = f"{inning_half.capitalize()} {inning_ordinal} inning"
+
             current_play = live_data.get('plays', {}).get('currentPlay')
 
             batter = "N/A"
@@ -112,7 +119,7 @@ def get_scores(team_name=None):
             print(
                 f"{game['away_name']} ({game['away_score']}) @ "
                 f"{game['home_name']} ({game['home_score']}) - "
-                f"{game['status']}"
+                f"{game['status']} {inning_info}"
                 f"\n\tPitcher: {pitcher}"
                 f"\n\tBatter: {batter}"
             )
