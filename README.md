@@ -37,3 +37,5 @@ For example:
 ```
 python3 get_scores.py --team "Yankees"
 ```
+
+This will provide a detailed box score for the specified team's game, including game info, linescore, current play, and box score.
