@@ -39,3 +39,5 @@ python3 get_scores.py --team "Yankees"
 ```
 
 This will provide a detailed box score for the specified team's game, including game info, linescore, current play, and box score.
+
+If the specified team does not have a game today, the script will output the date, time, and opponent of their next scheduled game.

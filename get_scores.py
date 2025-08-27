@@ -75,14 +75,23 @@ def print_detailed_game_info(game_data):
             print(f"{name.ljust(15)}\t{stats.get('atBats', 0)}\t{stats.get('runs', 0)}\t{stats.get('hits', 0)}\t{stats.get('rbi', 0)}\t{stats.get('strikeOuts', 0)}")
 
 def get_scores(team_name=None):
+    if team_name:
+        try:
+            team_id = statsapi.lookup_team(team_name)[0]['id']
+        except IndexError:
+            print(f"Could not find team: {team_name}")
+            return
+
     today = date.today().strftime("%m/%d/%Y")
     scores = statsapi.schedule(date=today)
 
+    game_found = False
     for game in scores:
         if game['status'] in ['Final', 'Game Over', 'In Progress']:
             if team_name and not (team_name.lower() in game['away_name'].lower() or team_name.lower() in game['home_name'].lower()):
                 continue
-
+            
+            game_found = True
             gamePk = game['game_id']
             game_data = statsapi.get('game', {'gamePk': gamePk})
 
@@ -107,6 +116,19 @@ def get_scores(team_name=None):
                 f"\n\tPitcher: {pitcher}"
                 f"\n\tBatter: {batter}"
             )
+
+    if team_name and not game_found:
+        next_game_id = statsapi.next_game(team_id)
+        if next_game_id:
+            next_game_data = statsapi.get('game', {'gamePk': next_game_id})
+            game_info = next_game_data.get('gameData', {})
+            away_team = game_info.get('teams', {}).get('away', {}).get('name', 'N/A')
+            home_team = game_info.get('teams', {}).get('home', {}).get('name', 'N/A')
+            date_time = game_info.get('datetime', {}).get('dateTime', 'N/A')
+            venue = game_info.get('venue', {}).get('name', 'N/A')
+            print(f"No active game for {team_name}. Next game is on {date_time} at {venue} vs the {away_team if home_team == team_name else home_team}")
+        else:
+            print(f"No active or upcoming games found for {team_name}")
 
 
 if __name__ == "__main__":
